@@ -1,4 +1,7 @@
-import pygame, math
+import math
+import pygame
+
+
 class Particle:
     def __init__(self, x, y, radius, mass, velocity, acceleration, color):
         self.x = x
@@ -14,9 +17,6 @@ class Particle:
 
         self.color = color
         self.trail = []
-
-    def move(self):
-        pass
 
     def draw_particle(self, window):
         pygame.draw.circle(window, self.color, self.position, self.radius)
@@ -42,6 +42,7 @@ class Particle:
         self.velocity[1] += force[1] / self.mass
 
     def calculate_gravity(self, other, G):
+        # Calculating gravity between particles
         dx = other.position[0] - self.position[0]
         dy = other.position[1] - self.position[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -53,7 +54,8 @@ class Particle:
 
     def merge(self, other):
         new_mass = self.mass + other.mass
-        new_velocity = [(self.velocity[0] * self.mass + other.velocity[0] * other.mass) / new_mass, (self.velocity[1] * self.mass + other.velocity[1] * other.mass) / new_mass]
+        new_velocity = [(self.velocity[0] * self.mass + other.velocity[0] * other.mass) / new_mass,
+                        (self.velocity[1] * self.mass + other.velocity[1] * other.mass) / new_mass]
         self.velocity = new_velocity
         self.mass = new_mass
         self.radius = int(math.sqrt(self.radius ** 2 + other.radius ** 2))
