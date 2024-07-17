@@ -23,8 +23,13 @@ class Particle:
 
     def draw_trail(self, window):
         for i, pos in enumerate(self.trail):
-            alpha = int(255 * (i / len(self.trail)))
-            trail_color = (*self.color[:3], alpha)
+            sample_velocity = math.sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2) # Speed of the particle
+            sample_velocity = sample_velocity * 2
+            if sample_velocity > 255:
+                sample_velocity = 255
+            elif sample_velocity <= 0:
+                sample_velocity = 0
+            trail_color = (0 + sample_velocity, 1, 255 - sample_velocity)
             trail_surface = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
             pygame.draw.circle(trail_surface, trail_color, (self.radius, self.radius), self.radius)
             window.blit(trail_surface, (pos[0] - self.radius, pos[1] - self.radius))
@@ -42,7 +47,7 @@ class Particle:
         self.velocity[1] += force[1] / self.mass
 
     def calculate_gravity(self, other, G):
-        # Calculating gravity between particles
+        # Calculating gravity between particles, optimizations needed here
         dx = other.position[0] - self.position[0]
         dy = other.position[1] - self.position[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -57,6 +62,8 @@ class Particle:
         new_velocity = [(self.velocity[0] * self.mass + other.velocity[0] * other.mass) / new_mass,
                         (self.velocity[1] * self.mass + other.velocity[1] * other.mass) / new_mass]
         self.velocity = new_velocity
+        self.position = [(self.position[0] * self.mass + other.position[0] * other.mass) / new_mass,
+                         (self.position[1] * self.mass + other.position[1] * other.mass) / new_mass]
         self.mass = new_mass
         self.radius = int(math.sqrt(self.radius ** 2 + other.radius ** 2))
         self.trail = []

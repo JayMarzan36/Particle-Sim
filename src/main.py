@@ -1,11 +1,14 @@
 import pygame, sys, random, math
 from particle import Particle
 import kdTree
+
 pygame.init()
-width = 800
-height = 600
+width = 1000
+height = 800
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Particle-Sim")
+
+
 def draw_ui(font, clock, particles):
     clock.tick(60)
     fps = str(int(clock.get_fps()))
@@ -13,14 +16,16 @@ def draw_ui(font, clock, particles):
     window.blit(fps_text, (10, 10))
     particles_stat = font.render(f"Particles: {int(len(particles))}", True, (255, 255, 255))
     window.blit(particles_stat, (80, 10))
+
+
 def main():
     G = 0.1
     font = pygame.font.Font(None, 20)
     particles = []
-    for i in range(200):
+    for i in range(100):
         particles.append(
-            Particle(random.randint(0, width), random.randint(0, height), 1, 1,
-                     [math.sin(random.uniform(0, 30)), math.cos(random.uniform(0, 30))], 0,
+            Particle(random.randint(0, width), random.randint(0, height), 2, 1,
+                     [random.uniform(0, 2), random.uniform(0, 2)], 0,
                      (255, 255, 255)))
     running = True
     clock = pygame.time.Clock()
@@ -32,34 +37,51 @@ def main():
                 running = False
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
+                if event.button == 1 or event.button == 3:
                     mouse_drag_start = pygame.mouse.get_pos()
             elif event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
+                if event.button == 1 or event.button == 3:
                     mouse_pos = pygame.mouse.get_pos()
                     dx = mouse_pos[0] - mouse_drag_start[0]
                     dy = mouse_pos[1] - mouse_drag_start[1]
                     velocity = [dx * -1, dy * -1]
-                    particles.append(
-                        Particle(mouse_drag_start[0], mouse_drag_start[1], 1, 1, velocity, 0,
-                                 (255, 255, 255)))
+                    if event.button == 1:
+                        new_particle = Particle(mouse_drag_start[0], mouse_drag_start[1], 2, 1, velocity, 0,
+                                                (255, 255, 255))
+                    elif event.button == 3:
+                        new_particle = Particle(mouse_drag_start[0], mouse_drag_start[1], 5, 10_000, velocity, 0,
+                                                (255, 255, 255))
+                    particles.append(new_particle)
                 elif event.button == 2:
                     mouse_pos = pygame.mouse.get_pos()
-                    particles.append(Particle(mouse_pos[0], mouse_pos[1], 5, 10_000, [0,0], 0, (255, 0, 0)))
+                    particles.append(Particle(mouse_pos[0], mouse_pos[1], 5, 10_000, [0, 0], 0, (255, 255, 255)))
                 mouse_drag_start = None
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     particles.clear()
                     for i in range(400):
                         particles.append(
-                            Particle(random.randint(0, width), random.randint(0, height), 1, random.uniform(100, 1000),
+                            Particle(random.randint(0, width), random.randint(0, height), 2, random.uniform(100, 1000),
                                      [0, 0], 0,
                                      (255, 255, 255)))
         window.fill(color=(0, 0, 0))
 
         if mouse_drag_start:
             mouse_pos = pygame.mouse.get_pos()
-            pygame.draw.line(window, (255, 0, 0), mouse_drag_start, mouse_pos, 2)
+            dx = mouse_drag_start[0] - mouse_pos[0]
+            dy = mouse_drag_start[1] - mouse_pos[1]
+            position_difference = math.sqrt(dx ** 2 + dy ** 2)
+            if position_difference > 255:
+                position_difference = 255
+            launch_color = (0 + position_difference, 0, 255 - position_difference)
+
+            pygame.draw.line(window, launch_color, mouse_drag_start, mouse_pos, 2)
+
+        particles_to_remove = []
+        for particle in particles:
+            if particle.position[0] > width or particle.position[0] < 0 or particle.position[1] > height or particle.position[1] < 0:
+                particles_to_remove.append(particle)
+        particles = [particle for particle in particles if particle not in particles_to_remove]
 
         # calculating and applying new forces
         for particle in particles:
@@ -71,7 +93,7 @@ def main():
                     total_force[1] += force[1]
             particle.apply_force(total_force)
 
-        particles_to_remove = []
+        particles_to_remove.clear()
         # Collision
         for i, particle in enumerate(particles):
             for j, other in enumerate(particles):
