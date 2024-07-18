@@ -1,22 +1,8 @@
-import random, math
-import pygame
-import numpy as np
+import math
 
 from particle import Particle
 from QuadTree import QuadTree
-
-
-def gen_rand(amount: int, width, height, velocity_range: list):
-    particle_list = []
-    for i in range(amount):
-        x = random.randint(0, width)
-        y = random.randint(0, height)
-        particle_list.append(Particle(x, y, 2, 10, [0.5, 0.5], 0, (255, 255, 255)))
-    return particle_list
-
-
 def draw_ui(font, clock, particles, window):
-
     clock.tick(60)
     fps = str(int(clock.get_fps()))
     fps_text = font.render(f"Fps: {int(fps)}", True, (255, 255, 255))
@@ -24,9 +10,6 @@ def draw_ui(font, clock, particles, window):
 
     particles_stat = font.render(f"Particles: {int(len(particles))}", True, (255, 255, 255))
     window.blit(particles_stat, (80, 10))
-
-
-
 
 
 def build_tree(particles, boundary, capacity=1):
@@ -83,9 +66,8 @@ def update_particles(particles, quadtree, width, height, theta=0.5, G=0.1, dt=0.
     particles_to_remove = []
     for particle in particles:
         if particle.position[0] > width or particle.position[0] < 0 or particle.position[1] > height or \
-            particle.position[1] < 0:
+                particle.position[1] < 0:
             particles_to_remove.append(particle)
-
         force = compute_force(particle, quadtree, theta, G)
         particle.apply_force(force)
         particle.update(dt)
