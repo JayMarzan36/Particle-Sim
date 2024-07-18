@@ -1,4 +1,4 @@
-import pygame, sys, queue, threading, math, time
+import pygame, sys, math, threading
 from particle import Particle
 from sim_utils import draw_ui, draw_full_particle, build_tree, update_particles
 from uiButton import Button
@@ -16,15 +16,14 @@ def main():
     node_button = Button(200, 5, 80, 20, (255, 255, 255), "Show nodes", font)
     particles = gen_rand(100, width, height)
     clock = pygame.time.Clock()
-    running = True
     mouse_drag_start = None
 
-    while running:
+
+    while True:
         quadtree = build_tree(particles, (0, 0, width, height))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1 or event.button == 3:
@@ -40,15 +39,14 @@ def main():
                         dy = mouse_pos[1] - mouse_drag_start[1]
                         velocity = [dx * -1, dy * -1]
                         if event.button == 1:
-                            new_particle = Particle(mouse_drag_start[0], mouse_drag_start[1], 1, 1, velocity, 0,
-                                                    (255, 255, 255))
+                            particles.append(Particle(mouse_drag_start[0], mouse_drag_start[1], 1, 1, velocity,
+                                                    (255, 255, 255)))
                         elif event.button == 3:
-                            new_particle = Particle(mouse_drag_start[0], mouse_drag_start[1], 1, 10_000, velocity, 0,
-                                                    (255, 255, 255))
-                        particles.append(new_particle)
+                            particles.append(Particle(mouse_drag_start[0], mouse_drag_start[1], 1, 10_000, velocity,
+                                                    (255, 255, 255)))
                 elif event.button == 2:
                     mouse_pos = pygame.mouse.get_pos()
-                    particles.append(Particle(mouse_pos[0], mouse_pos[1], 1, 10_000, [0, 0], 0, (255, 255, 255)))
+                    particles.append(Particle(mouse_pos[0], mouse_pos[1], 1, 10_000, [0, 0],(255, 255, 255)))
                 mouse_drag_start = None
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
@@ -60,6 +58,9 @@ def main():
                 elif event.key == pygame.K_s:
                     particles.clear()
                     particles = small_galaxy(200, width, height)
+                elif event.key == pygame.K_g:
+                    particles.clear()
+                    particles = gen_rand(10000, width, height)
 
         window.fill(color=(0, 0, 0))
 
@@ -79,11 +80,11 @@ def main():
             node_button.color = (255, 255, 255)
 
         # update
+
         particles = update_particles(particles, quadtree, width, height, theta=10)
         draw_full_particle(particles, window)
         draw_ui(font, clock, particles, window)
         node_button.draw(window)
-
 
         if node_button.state:
             quadtree.visualize_tree(window)

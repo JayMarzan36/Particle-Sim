@@ -2,6 +2,8 @@ import math
 
 from particle import Particle
 from QuadTree import QuadTree
+
+
 def draw_ui(font, clock, particles, window):
     clock.tick(60)
     fps = str(int(clock.get_fps()))
@@ -23,9 +25,9 @@ def compute_force(particle, quadtree, theta=0.5, G=1.0):
     def force_between(p1, p2):
         dx = p2.position[0] - p1.position[0]
         dy = p2.position[1] - p1.position[1]
-        distance = math.sqrt(dx ** 2 + dy ** 2)
+        distance = math.sqrt(dx ** 2 + dy ** 2)  # This works but not dx * dx + dy * dy
         if distance == 0:
-            return [0, 0]
+            distance = 0.01
         force_magnitude = G * p1.mass * p2.mass / distance ** 2
         force_direction = [dx / distance, dy / distance]
         return [force_magnitude * force_direction[0], force_magnitude * force_direction[1]]
@@ -48,7 +50,7 @@ def compute_force(particle, quadtree, theta=0.5, G=1.0):
         if distance == 0:
             return [0, 0]
         if (node.boundary[2] / distance) < theta:
-            temp_particle = Particle(node.center_of_mass[0], node.center_of_mass[1], 0, node.total_mass, [0, 0], 0,
+            temp_particle = Particle(node.center_of_mass[0], node.center_of_mass[1], 0, node.total_mass, [0, 0],
                                      (0, 0, 0))
             return force_between(particle, temp_particle)
 
@@ -77,5 +79,5 @@ def update_particles(particles, quadtree, width, height, theta=0.5, G=0.1, dt=0.
 
 def draw_full_particle(particles, window):
     for particle in particles:
-        particle.draw_trail(window)
+        # particle.draw_trail(window)
         particle.draw_particle(window)

@@ -1,20 +1,15 @@
 import math
 import pygame
-import numpy as np
+
 
 class Particle:
-    def __init__(self, x, y, radius, mass, velocity, acceleration, color):
+    def __init__(self, x, y, radius, mass, velocity, color):
         self.x = x
         self.y = y
-
         self.position = [self.x, self.y]
-
         self.radius = radius
-
         self.mass = mass
         self.velocity = velocity
-        self.acceleration = acceleration
-
         self.color = color
         self.trail = []
 
@@ -44,25 +39,3 @@ class Particle:
     def apply_force(self, force):
         self.velocity[0] += force[0] / self.mass
         self.velocity[1] += force[1] / self.mass
-
-    def calculate_gravity(self, other, G):
-        # Calculating gravity between particles, optimizations needed here
-        dx = other.position[0] - self.position[0]
-        dy = other.position[1] - self.position[1]
-        distance = math.sqrt(dx ** 2 + dy ** 2)
-        if distance == 0:
-            return np.zeros(2)
-        force_magnitude = G * self.mass * other.mass / distance ** 2
-        force_direction = [dx / distance, dy / distance]
-        return [force_magnitude * force_direction[0], force_magnitude * force_direction[1]]
-
-    def merge(self, other):
-        new_mass = self.mass + other.mass
-        new_velocity = [(self.velocity[0] * self.mass + other.velocity[0] * other.mass) / new_mass,
-                        (self.velocity[1] * self.mass + other.velocity[1] * other.mass) / new_mass]
-        self.velocity = new_velocity
-        self.position = [(self.position[0] * self.mass + other.position[0] * other.mass) / new_mass,
-                         (self.position[1] * self.mass + other.position[1] * other.mass) / new_mass]
-        self.mass = new_mass
-        self.radius = int(math.sqrt(self.radius ** 2 + other.radius ** 2))
-        self.trail = []
