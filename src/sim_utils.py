@@ -1,5 +1,5 @@
 import math
-
+import threading
 from particle import Particle
 from QuadTree import QuadTree
 
@@ -26,9 +26,10 @@ def compute_force(particle, quadtree, theta=0.5, G=1.0):
         dx = p2.position[0] - p1.position[0]
         dy = p2.position[1] - p1.position[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)  # This works but not dx * dx + dy * dy
-        if distance == 0:
-            distance = 0.01
-        force_magnitude = G * p1.mass * p2.mass / distance ** 2
+        if distance <= 0:
+            return [0, 0]
+
+        force_magnitude = (G * (p1.mass * p2.mass)) / (distance ** 2)
         force_direction = [dx / distance, dy / distance]
         return [force_magnitude * force_direction[0], force_magnitude * force_direction[1]]
 
@@ -65,15 +66,15 @@ def compute_force(particle, quadtree, theta=0.5, G=1.0):
 
 
 def update_particles(particles, quadtree, width, height, theta=0.5, G=0.1, dt=0.01):
-    particles_to_remove = []
+    # particles_to_remove = []
     for particle in particles:
-        if particle.position[0] > width or particle.position[0] < 0 or particle.position[1] > height or \
-                particle.position[1] < 0:
-            particles_to_remove.append(particle)
+        # if particle.position[0] > width or particle.position[0] < 0 or particle.position[1] > height or \
+        #         particle.position[1] < 0:
+        #     particles_to_remove.append(particle)
         force = compute_force(particle, quadtree, theta, G)
         particle.apply_force(force)
         particle.update(dt)
-    particles = [particle for particle in particles if particle not in particles_to_remove]
+    # particles = [particle for particle in particles if particle not in particles_to_remove]
     return particles
 
 
@@ -81,3 +82,14 @@ def draw_full_particle(particles, window):
     for particle in particles:
         # particle.draw_trail(window)
         particle.draw_particle(window)
+
+
+def run_sim(particles, quadtree, width, height, window, theta=0.5, G=0.1, dt=0.01):
+    update_thread = threading.Thread(target=update_particles, args=(particles, quadtree, width, height, theta, G, dt))
+    render_thread = threading.Thread(target=draw_full_particle, args=(particles, window))
+
+    update_thread.start()
+    render_thread.start()
+
+    update_thread.join()
+    render_thread.join()

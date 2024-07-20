@@ -2,12 +2,22 @@ from particle import Particle
 import random
 
 
-def gen_rand(amount: int, width, height):
+def gen_rand(amount: int, width, height, rand=False, center=False):
     particle_list = []
     for i in range(amount):
-        x = random.randint((width / 4), width - (width / 4))
-        y = random.randint((height / 4), height - (height / 4))
-        particle_list.append(Particle(x, y, 1, 10, [0.0, 0.0], (255, 255, 255)))
+        if rand:
+            mass = random.randint(10, 100)
+        else:
+            mass = 10
+
+        if center:
+            x = random.randint((width / 4), width - (width / 4))
+            y = random.randint((height / 4), height - (height / 4))
+        else:
+            x = random.randint(0, width)
+            y = random.randint(0, height)
+
+        particle_list.append(Particle(x, y, 2, mass, [0.0, 0.0], (255, 255, 255)))
     return particle_list
 
 

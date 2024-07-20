@@ -14,7 +14,8 @@ class Particle:
         self.trail = []
 
     def draw_particle(self, window):
-        pygame.draw.circle(window, self.color, (self.position[0], self.position[1]), self.radius)
+        # pygame.draw.circle(window, self.color, (self.position[0], self.position[1]), self.radius)
+        window.set_at((int(self.position[0]), int(self.position[1])), self.color)
 
     def draw_trail(self, window):
         for i, pos in enumerate(self.trail):
@@ -39,3 +40,11 @@ class Particle:
     def apply_force(self, force):
         self.velocity[0] += force[0] / self.mass
         self.velocity[1] += force[1] / self.mass
+
+    def merge(self, other):
+        new_mass = self.mass + other.mass
+        new_velocity = [(self.velocity[0] * self.mass + other.velocity[0] * other.mass) / new_mass,
+                        (self.velocity[1] * self.mass + other.velocity[1] * other.mass) / new_mass]
+        self.velocity = new_velocity
+        self.mass = new_mass
+        self.radius = int(math.sqrt(self.radius ** 2 + other.radius ** 2))
