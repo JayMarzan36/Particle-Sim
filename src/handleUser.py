@@ -33,7 +33,7 @@ def handle_user(width, height, particles, mouse_drag_start, node_button):
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 particles.clear()
-                particles = gen_rand(1000, width, height, rand=True)
+                particles = gen_rand(2000, width, height, rand=True)
             elif event.key == pygame.K_t:
                 particles.clear()
                 particles = gen_rand(1000, width, height, rand=True, center=True)
@@ -42,7 +42,7 @@ def handle_user(width, height, particles, mouse_drag_start, node_button):
                 particles = plus(width, height)
             elif event.key == pygame.K_s:
                 particles.clear()
-                particles = small_galaxy(200, width, height)
+                particles = small_galaxy(1000, width, height)
             elif event.key == pygame.K_g:
                 particles.clear()
                 particles = gen_rand(10000, width, height, center=True)

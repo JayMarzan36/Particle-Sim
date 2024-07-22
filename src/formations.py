@@ -2,7 +2,7 @@ from particle import Particle
 import random
 
 
-def gen_rand(amount: int, width, height, rand=False, center=False):
+def gen_rand(amount: int, width, height, rand=False, center=False, velocity=False):
     particle_list = []
     for i in range(amount):
         if rand:
@@ -17,7 +17,12 @@ def gen_rand(amount: int, width, height, rand=False, center=False):
             x = random.randint(0, width)
             y = random.randint(0, height)
 
-        particle_list.append(Particle(x, y, 2, mass, [0.0, 0.0], (255, 255, 255)))
+        if velocity:
+            v = [random.uniform(-30,30), random.uniform(-30, 30)]
+        else:
+            v = [0, 0]
+
+        particle_list.append(Particle(x, y, 2, mass, v, (255, 255, 255)))
     return particle_list
 
 
@@ -31,9 +36,9 @@ def plus(width, height):
 
 
 def small_galaxy(amount, width, height):
-    particle_list = [Particle((width // 2), (height // 2), 4, 100000, [0, 0], (255, 255, 255))]
+    particle_list = [Particle((width // 2), (height // 2), 4, 800_000, [0, 0], (255, 255, 255))]
     for i in range(amount):
         new_particle = Particle(random.randint(0, width), random.randint(0, height), 1, random.randint(1, 100),
-                                [random.randint(-30, 30), random.randint(-30, 30)], (255, 255, 255))
+                                [random.uniform(-30, 30), random.uniform(-30, 30)], (255, 255, 255))
         particle_list.append(new_particle)
     return particle_list

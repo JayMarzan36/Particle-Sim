@@ -65,16 +65,21 @@ def compute_force(particle, quadtree, theta=0.5, G=1.0):
     return traverse(quadtree)
 
 
-def update_particles(particles, quadtree, width, height, theta=0.5, G=0.1, dt=0.01):
-    # particles_to_remove = []
+def update_particles(particles, quadtree, width, height, window, theta=0.5, G=0.1, dt=0.01):
+    particles_to_remove = []
+    render = None
     for particle in particles:
-        # if particle.position[0] > width or particle.position[0] < 0 or particle.position[1] > height or \
-        #         particle.position[1] < 0:
-        #     particles_to_remove.append(particle)
+        if particle.position[0] > width or particle.position[0] < 0 or particle.position[1] > height or \
+                particle.position[1] < 0:
+            render = False
+        else:
+            render = True
         force = compute_force(particle, quadtree, theta, G)
         particle.apply_force(force)
         particle.update(dt)
-    # particles = [particle for particle in particles if particle not in particles_to_remove]
+    particles = [particle for particle in particles if particle not in particles_to_remove]
+    if render:
+        draw_full_particle(particles, window)
     return particles
 
 

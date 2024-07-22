@@ -14,7 +14,7 @@ pygame.display.set_caption("Particle-Sim")
 def main():
     font = pygame.font.Font(None, 20)
     node_button = Button(200, 5, 80, 20, (255, 255, 255), "Show nodes", font)
-    particles = gen_rand(100, width, height)
+    particles = gen_rand(500,width, height, rand=True, velocity=True)
     clock = pygame.time.Clock()
     mouse_drag_start = None
 
@@ -27,8 +27,8 @@ def main():
         show_mouse_launch(mouse_drag_start, window)
         handle_user_button(node_button)
         # update
-        particles = update_particles(particles, quadtree, width, height, theta=10)
-        draw_full_particle(particles, window)
+        particles = update_particles(particles, quadtree, width, height, window, theta=5)
+        #draw_full_particle(particles, window)
 
         draw_ui(font, clock, particles, window)
         node_button.draw(window)
